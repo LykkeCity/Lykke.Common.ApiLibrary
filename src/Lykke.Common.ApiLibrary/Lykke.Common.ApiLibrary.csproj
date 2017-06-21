@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.6</TargetFramework>
+    <Authors>Lykke</Authors>
+    <Company>Lykke</Company>
+    <Description>Utility libraries for DotNetCore WebAPI projects</Description>
+    <PackageLicenseUrl>https://github.com/LykkeCity/Lykke.Common.ApiLibrary/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/LykkeCity/Lykke.Common.ApiLibrary</PackageProjectUrl>
+    <PackageIconUrl>https://avatars3.githubusercontent.com/u/14153330?v=3&amp;s=200</PackageIconUrl>
+    <RepositoryUrl>https://github.com/LykkeCity/Lykke.Common.ApiLibrary.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Lykke</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Lykke.Common" Version="1.1.69" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.0.1" />
+    <PackageReference Include="Swashbuckle.SwaggerGen" Version="6.0.0-beta902" />
+    <PackageReference Include="Swashbuckle.SwaggerUi" Version="6.0.0-beta902" />
+  </ItemGroup>
+
+</Project>
