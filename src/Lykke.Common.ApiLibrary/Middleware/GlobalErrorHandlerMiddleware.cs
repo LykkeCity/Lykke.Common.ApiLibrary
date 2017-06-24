@@ -33,7 +33,7 @@ namespace Lykke.Common.ApiLibrary.Middleware
             catch (Exception ex)
             {
                 await LogError(context, ex);
-                await CreateErrorResponse(context);
+                await CreateErrorResponse(context, ex);
             }
         }
 
@@ -49,12 +49,12 @@ namespace Lykke.Common.ApiLibrary.Middleware
             }
         }
 
-        private async Task CreateErrorResponse(HttpContext ctx)
+        private async Task CreateErrorResponse(HttpContext ctx, Exception ex)
         {
             ctx.Response.ContentType = "application/json";
             ctx.Response.StatusCode = 500;
 
-            var response = _createErrorResponse();
+            var response = _createErrorResponse(ex);
             var responseJson = JsonConvert.SerializeObject(response);
 
             await ctx.Response.WriteAsync(responseJson);
