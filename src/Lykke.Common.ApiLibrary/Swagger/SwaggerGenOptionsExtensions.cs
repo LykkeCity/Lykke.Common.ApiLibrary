@@ -1,5 +1,6 @@
 using System.IO;
 using System.Reflection;
+using Lykke.Common.ApiLibrary.Swagger.XmsEnum;
 using Microsoft.Extensions.PlatformAbstractions;
 using Swashbuckle.Swagger.Model;
 using Swashbuckle.SwaggerGen.Application;
@@ -16,6 +17,30 @@ namespace Lykke.Common.ApiLibrary.Swagger
         public static void EnableXmsEnumExtension(this SwaggerGenOptions swaggerOptions, XmsEnumExtensionsOptions options = XmsEnumExtensionsOptions.UseEnums)
         {
             swaggerOptions.SchemaFilter<XmsEnumSchemaFilter>(options);
+            swaggerOptions.OperationFilter<XmsEnumOperationFilter>(options);
+        }
+
+        /// <summary>
+        /// Includes source code's XML documentation into swagger document
+        /// </summary>
+        /// <remarks>
+        /// Documentation will be included to swagger document only if assembly's 
+        /// XML documentation file generation enabled and it's name corresponds to
+        /// assembly name
+        /// </remarks>
+        public static void EnableXmlDocumentation(this SwaggerGenOptions swaggerOptions)
+        {
+            //Determine base path for the application.
+            var basePath = PlatformServices.Default.Application.ApplicationBasePath;
+            var entryAssembly = Assembly.GetEntryAssembly();
+
+            //Set the comments path for the swagger json and ui.
+            var xmlPath = Path.Combine(basePath, $"{entryAssembly.GetName().Name}.xml");
+
+            if (File.Exists(xmlPath))
+            {
+                swaggerOptions.IncludeXmlComments(xmlPath);
+            }
         }
 
         /// <summary>
@@ -34,18 +59,7 @@ namespace Lykke.Common.ApiLibrary.Swagger
 
             swaggerOptions.DescribeAllEnumsAsStrings();
             swaggerOptions.EnableXmsEnumExtension();
-
-            //Determine base path for the application.
-            var basePath = PlatformServices.Default.Application.ApplicationBasePath;
-            var entryAssembly = Assembly.GetEntryAssembly();
-
-            //Set the comments path for the swagger json and ui.
-            var xmlPath = Path.Combine(basePath, $"{entryAssembly.GetName().Name}.xml");
-
-            if (File.Exists(xmlPath))
-            {
-                swaggerOptions.IncludeXmlComments(xmlPath);
-            }
+            swaggerOptions.EnableXmlDocumentation();
         }
     }
 }

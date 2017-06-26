@@ -1,4 +1,4 @@
-﻿namespace Lykke.Common.ApiLibrary.Swagger
+﻿namespace Lykke.Common.ApiLibrary.Swagger.XmsEnum
 {
     public enum XmsEnumExtensionsOptions
     {

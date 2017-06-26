@@ -1,9 +1,10 @@
 ﻿using System.Linq;
 using System.Reflection;
+using Lykke.Common.ApiLibrary.Swagger.XmsEnum;
 using Swashbuckle.Swagger.Model;
 using Swashbuckle.SwaggerGen.Generator;
 
-namespace Lykke.Common.ApiLibrary.Swagger
+namespace Lykke.Common.ApiLibrary.Swagger.XmsEnum
 {
     public class XmsEnumSchemaFilter : ISchemaFilter
     {
@@ -23,13 +24,11 @@ namespace Lykke.Common.ApiLibrary.Swagger
 
             foreach (var property in model.Properties.Where(x => x.Value.Enum != null))
             {
-                var typeProperty = context.SystemType.GetProperty(property.Key, BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public).PropertyType;
+                var propertyType = context.SystemType
+                    .GetProperty(property.Key, BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public)
+                    .PropertyType;
 
-                property.Value.Extensions.Add("x-ms-enum", new
-                {
-                    name = typeProperty.Name,
-                    modelAsString = _options != XmsEnumExtensionsOptions.UseEnums
-                });
+                XmsEnumExtensionApplicator.Apply(property.Value.Extensions, propertyType, _options);
             }
         }
     }
