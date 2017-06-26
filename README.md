@@ -12,17 +12,28 @@ To configure swagger with default Lykke options, add next invocation to your Sta
 
 ```cs
 services.AddSwaggerGen(options =>
-  {
-      options.DefaultLykkeConfiguration("v1", "Your API name");
-  });
+{
+    options.DefaultLykkeConfiguration("v1", "Your API name");
+});
 ```
 
 If you need individual swagger configuration, you can use next extensions:
+
+### EnableXmsEnumExtension
 
 ```cs
 // Enables "x-ms-enum" swagger extension, wich allows Autorest tool generates enum or set of string constants for each server-side enum.
 // Optionaly you can specify XmsEnumExtensionsOptions to configure extension
 options.EnableXmsEnumExtension();
+```
+
+### EnableXmlDocumentation
+
+```cs
+// Includes source code's XML documentation into swagger document.
+// Documentation will be included to swagger document only if assembly's 
+// XML documentation file generation enabled and it's name corresponds to the assembly name.
+options.EnableXmlDocumentation();
 ```
 
 ## Middleware
