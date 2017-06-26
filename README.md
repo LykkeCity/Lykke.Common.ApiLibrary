@@ -41,12 +41,14 @@ options.EnableXmlDocumentation();
 To configure default Lykke middleware, add next invocation to your Startup.Configure method:
 
 ```cs
-app.UseLykkeMiddleware("Your main component name", () => ErrorResponse.Create("Technical problem"));
+app.UseLykkeMiddleware("Your main component name", ex => ErrorResponse.Create("Technical problem"));
 ```
 
 If you need individual middleware configuration, you can use next extensions:
 
+### GlobalErrorHandlerMiddleware
+
 ```cs
 // Adds global error handler, wich logs uncaught errors and sends json error response, wich specified by delegate
-app.UseMiddleware<GlobalErrorHandlerMiddleware>("Your main component name", () => ErrorResponse.Create("Technical problem"));
+app.UseMiddleware<GlobalErrorHandlerMiddleware>("Your main component name", ex => ErrorResponse.Create("Technical problem"));
 ```
