@@ -17,6 +17,13 @@ services.AddSwaggerGen(options =>
 });
 ```
 
+What this invocation actualy do:
+
+* Setups API version and description, using arguments passed by you
+* Enables enum serialization as string values, not numbers
+* Enables xms-enum extension, which allows Autorest to generate enums on client side
+* Includes xml-documentation, if xml-file generation enabled in your project. (xml file name should equals assembly file name)
+
 If you need individual swagger configuration, you can use next extensions:
 
 ### EnableXmsEnumExtension
