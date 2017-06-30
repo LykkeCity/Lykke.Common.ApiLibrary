@@ -29,7 +29,7 @@ If you need individual swagger configuration, you can use next extensions:
 ### EnableXmsEnumExtension
 
 ```cs
-// Enables "x-ms-enum" swagger extension, wich allows Autorest tool generates enum or set of string constants for each server-side enum.
+// Enables "x-ms-enum" swagger extension, which allows Autorest tool generates enum or set of string constants for each server-side enum.
 // Optionaly you can specify XmsEnumExtensionsOptions to configure extension
 options.EnableXmsEnumExtension();
 ```
@@ -51,11 +51,15 @@ To configure default Lykke middleware, add next invocation to your Startup.Confi
 app.UseLykkeMiddleware("Your main component name", ex => ErrorResponse.Create("Technical problem"));
 ```
 
+What this invocation actualy do:
+
+* Registers global error handling middleware, which logs uncaught errors and sends json error response, which in turn specified by delegate
+
 If you need individual middleware configuration, you can use next extensions:
 
 ### GlobalErrorHandlerMiddleware
 
 ```cs
-// Adds global error handler, wich logs uncaught errors and sends json error response, wich specified by delegate
+// Adds global error handler, which logs uncaught errors and sends json error response, which in turn specified by delegate
 app.UseMiddleware<GlobalErrorHandlerMiddleware>("Your main component name", ex => ErrorResponse.Create("Technical problem"));
 ```
