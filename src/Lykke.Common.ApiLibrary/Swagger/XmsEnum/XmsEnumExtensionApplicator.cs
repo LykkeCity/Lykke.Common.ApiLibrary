@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Lykke.Common.ApiLibrary.Swagger.XmsEnum
 {
@@ -9,7 +10,9 @@ namespace Lykke.Common.ApiLibrary.Swagger.XmsEnum
         {
             extensions.Add("x-ms-enum", new
             {
-                name = enumType.Name,
+                name = enumType.GetTypeInfo().IsGenericType && enumType.GetGenericTypeDefinition() == typeof(Nullable<>) ?
+                    enumType.GetGenericArguments()[0].Name :
+                    enumType.Name,
                 modelAsString = options != XmsEnumExtensionsOptions.UseEnums
             });
         }
