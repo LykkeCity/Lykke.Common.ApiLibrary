@@ -21,7 +21,7 @@ namespace Lykke.Common.ApiLibrary.Swagger.XmsEnum
                 return;
             }
 
-            foreach (var parameterDescription in context.ApiDescription.ParameterDescriptions.Where(p => IntrospectionExtensions.GetTypeInfo(p.Type).IsEnum))
+            foreach (var parameterDescription in context.ApiDescription.ParameterDescriptions.Where(p => p.Type.GetTypeInfo().IsEnum))
             {
                 var operationParameter = operation.Parameters.Single(p => p.Name == parameterDescription.Name);
 
