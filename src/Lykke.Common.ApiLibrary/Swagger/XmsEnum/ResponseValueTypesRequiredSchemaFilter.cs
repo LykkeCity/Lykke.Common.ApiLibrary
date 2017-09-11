@@ -22,6 +22,11 @@ namespace Lykke.Common.ApiLibrary.Swagger.XmsEnum
             schema.Required = schema.Properties.Keys
                 .Intersect(nonNulableValueTypedPropNames, StringComparer.OrdinalIgnoreCase)
                 .ToList();
+
+            if (!schema.Required.Any())
+            {
+                schema.Required = null;
+            }
         }
     }
 }
