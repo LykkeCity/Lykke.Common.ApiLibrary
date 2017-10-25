@@ -16,7 +16,13 @@ namespace Lykke.Common.ApiLibrary.Swagger.XmsEnum
             }
 
             var nonNulableValueTypedPropNames = context.SystemType.GetProperties()
-                .Where(p => p.PropertyType.GetTypeInfo().IsValueType && Nullable.GetUnderlyingType(p.PropertyType) == null)
+                .Where(p =>
+                    // is it value type?
+                    p.PropertyType.GetTypeInfo().IsValueType &&
+                    // is it not nullable type?
+                    Nullable.GetUnderlyingType(p.PropertyType) == null &&
+                    // is it read/write property
+                    p.CanRead && p.CanWrite)
                 .Select(p => p.Name);
 
             schema.Required = schema.Properties.Keys
