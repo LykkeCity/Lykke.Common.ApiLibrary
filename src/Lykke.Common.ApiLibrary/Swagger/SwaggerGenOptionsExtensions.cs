@@ -2,8 +2,8 @@ using System.IO;
 using System.Reflection;
 using Lykke.Common.ApiLibrary.Swagger.XmsEnum;
 using Microsoft.Extensions.PlatformAbstractions;
-using Swashbuckle.Swagger.Model;
-using Swashbuckle.SwaggerGen.Application;
+using Swashbuckle.AspNetCore.Swagger;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Common.ApiLibrary.Swagger
 {
@@ -59,11 +59,13 @@ namespace Lykke.Common.ApiLibrary.Swagger
         /// <param name="apiTitle">Api title</param>
         public static void DefaultLykkeConfiguration(this SwaggerGenOptions swaggerOptions, string apiVersion, string apiTitle)
         {
-            swaggerOptions.SingleApiVersion(new Info
-            {
-                Version = apiVersion,
-                Title = apiTitle
-            });
+            swaggerOptions.SwaggerDoc(
+                $"{apiTitle} {apiVersion}",
+                new Info
+                {
+                    Version = apiVersion,
+                    Title = apiTitle
+                });
 
             swaggerOptions.DescribeAllEnumsAsStrings();
             swaggerOptions.EnableXmsEnumExtension();
