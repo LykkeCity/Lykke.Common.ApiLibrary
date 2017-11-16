@@ -60,7 +60,7 @@ namespace Lykke.Common.ApiLibrary.Swagger
         public static void DefaultLykkeConfiguration(this SwaggerGenOptions swaggerOptions, string apiVersion, string apiTitle)
         {
             swaggerOptions.SwaggerDoc(
-                $"{apiTitle} {apiVersion}",
+                $"{apiVersion}",
                 new Info
                 {
                     Version = apiVersion,
