@@ -21,8 +21,8 @@ namespace Lykke.Common.ApiLibrary.Swagger.XmsEnum
                     p.PropertyType.GetTypeInfo().IsValueType &&
                     // is it not nullable type?
                     Nullable.GetUnderlyingType(p.PropertyType) == null &&
-                    // is it read/write property
-                    p.CanRead && p.CanWrite)
+                    // is it readable property
+                    p.CanRead)
                 .Select(p => p.Name);
 
             schema.Required = schema.Properties.Keys
