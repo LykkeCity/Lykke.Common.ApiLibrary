@@ -26,7 +26,7 @@
   <ItemGroup Label="dotnet pack instructions">
     <Content Include="$(OutputPath)$(AssemblyName).pdb">
       <Pack>true</Pack>
-      <PackagePath>lib/netstandard2.0</PackagePath>
+      <PackagePath>lib/netstandard1.6</PackagePath>
     </Content>
   </ItemGroup>
 
