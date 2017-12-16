@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Reflection;
 using Swashbuckle.AspNetCore.Swagger;
@@ -19,6 +20,22 @@ namespace Lykke.Common.ApiLibrary.Swagger.XmsEnum
             if (operation.Parameters == null)
             {
                 return;
+            }
+
+            var invalidParameters = context.ApiDescription.ParameterDescriptions.Where(p => p.Type == null).ToArray();
+
+            if (invalidParameters.Any())
+            {
+                var invalidParameter = invalidParameters.First();
+                var message =
+$@"Invalid parameter found. Probably parameter source mismatched. (e.g. You specified [FromQuery] for the path parameter).
+
+Action: {context.ApiDescription?.ActionDescriptor.DisplayName}
+Relaive path: {context.ApiDescription?.RelativePath}
+OperationId: {operation.OperationId}
+Parameter: {invalidParameter?.Name}
+Expected parameter source: {invalidParameter?.Source.DisplayName}";
+                throw new InvalidOperationException(message);
             }
 
             foreach (var parameterDescription in context.ApiDescription.ParameterDescriptions.Where(p => p.Type.GetTypeInfo().IsEnum))
