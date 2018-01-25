@@ -56,12 +56,13 @@ options.MakeResponseValueTypesRequired();
 To configure default Lykke middleware, add next invocation to your Startup.Configure method:
 
 ```cs
-app.UseLykkeMiddleware("Your main component name", ex => ErrorResponse.Create("Technical problem"));
+app.UseLykkeMiddleware("Your main component name", ex => ErrorResponse.Create("Technical problem"), logClientErrors: true);
 ```
 
 What this invocation actualy do:
 
-* Registers global error handling middleware, which logs uncaught errors and sends json error response, which in turn specified by delegate
+* Registers global error handling middleware, which logs uncaught errors and sends json error response, which in turn specified by delegate.
+* Registers client error handling middleware, which logs HTTP 4xx errors. It is optional, you can omit `logClientErrors` argument, if it's not necessary.
 
 If you need individual middleware configuration, you can use next extensions:
 
@@ -70,4 +71,11 @@ If you need individual middleware configuration, you can use next extensions:
 ```cs
 // Adds global error handler, which logs uncaught errors and sends json error response, which in turn specified by delegate
 app.UseMiddleware<GlobalErrorHandlerMiddleware>("Your main component name", ex => ErrorResponse.Create("Technical problem"));
+```
+
+### ClientErrorHandlerMiddleware
+
+```cs
+// Adds client error handler, which logs HTTP 4xx errors
+app.UseMiddleware<ClientErrorHandlerMiddleware>("Your main component name");
 ```
