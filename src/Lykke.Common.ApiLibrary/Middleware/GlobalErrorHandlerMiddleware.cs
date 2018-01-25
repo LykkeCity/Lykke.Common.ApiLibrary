@@ -39,6 +39,12 @@ namespace Lykke.Common.ApiLibrary.Middleware
 
         private async Task LogError(HttpContext context, Exception ex)
         {
+            // request body might be already read at the moment 
+            if (context.Request.Body.CanSeek)
+            {
+                context.Request.Body.Seek(0, SeekOrigin.Begin);
+            }
+
             using (var ms = new MemoryStream())
             {
                 context.Request.Body.CopyTo(ms);
