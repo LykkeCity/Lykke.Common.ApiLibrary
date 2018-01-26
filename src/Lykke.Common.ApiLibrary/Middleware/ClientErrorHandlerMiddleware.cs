@@ -37,7 +37,8 @@ namespace Lykke.Common.ApiLibrary.Middleware
         {
             var body = string.Empty;
 
-            if (context.Request.Body.CanSeek)
+            if (context.Request.Body.CanSeek &&
+                context.Request.Body.Length > 0)
             {
                 context.Request.Body.Seek(0, SeekOrigin.Begin);
 
