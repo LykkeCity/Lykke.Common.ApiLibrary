@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Lykke</Authors>
@@ -15,19 +14,17 @@
     <FileVersion>1.0.1.0</FileVersion>
     <Version>1.0.1</Version>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Lykke.Common" Version="3.2.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.HttpOverrides" Version="2.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="1.1.0" />
     <PackageReference Include="SourceLink.Create.CommandLine" Version="2.5.0" PrivateAssets="All" />
   </ItemGroup>
-
   <ItemGroup Label="dotnet pack instructions">
     <Content Include="$(OutputPath)$(AssemblyName).pdb">
       <Pack>true</Pack>
       <PackagePath>lib/netstandard1.6</PackagePath>
     </Content>
   </ItemGroup>
-
 </Project>

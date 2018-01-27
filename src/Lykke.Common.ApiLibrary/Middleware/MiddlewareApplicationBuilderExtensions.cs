@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace Lykke.Common.ApiLibrary.Middleware
 {
@@ -28,6 +29,23 @@ namespace Lykke.Common.ApiLibrary.Middleware
             {
                 app.UseMiddleware<ClientErrorHandlerMiddleware>(componentName);
             }
+        }
+        
+        /// <summary>
+        /// Configure application to use forwarded headers
+        /// </summary>
+        /// <param name="app">Application builder</param>
+        public static void UseLykkeForwardedHeaders(this IApplicationBuilder app)
+        {
+            var forwardingOptions = new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost
+            };
+                
+            forwardingOptions.KnownNetworks.Clear(); //its loopback by default
+            forwardingOptions.KnownProxies.Clear();
+            
+            app.UseForwardedHeaders(forwardingOptions);
         }
     }
 }
