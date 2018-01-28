@@ -66,17 +66,11 @@ Expected parameter source: {invalidParameter?.Source.DisplayName}";
                 return parameter.Type;
             }
 
-            if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(Nullable<>) )
-            {
-                var elementType = typeInfo.GetGenericArguments()[0];
+            var nullableUnderlyingType = Nullable.GetUnderlyingType(parameter.Type);
 
-                if (elementType.IsEnum)
-                {
-                    return elementType;
-                }
-            }
-
-            return null;
+            return nullableUnderlyingType.IsEnum 
+                ? nullableUnderlyingType 
+                : null;
         }
     }
 }
