@@ -59,16 +59,14 @@ Expected parameter source: {invalidParameter?.Source.DisplayName}";
 
         private static Type TryGetEnumType(ApiParameterDescription parameter)
         {
-            var typeInfo = parameter.Type.GetTypeInfo();
-
-            if (typeInfo.IsEnum)
+            if (parameter.Type.GetTypeInfo().IsEnum)
             {
                 return parameter.Type;
             }
 
             var nullableUnderlyingType = Nullable.GetUnderlyingType(parameter.Type);
 
-            return nullableUnderlyingType.IsEnum 
+            return nullableUnderlyingType.GetTypeInfo().IsEnum 
                 ? nullableUnderlyingType 
                 : null;
         }
