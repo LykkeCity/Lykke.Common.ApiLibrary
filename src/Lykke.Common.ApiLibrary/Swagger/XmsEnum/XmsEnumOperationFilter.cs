@@ -66,7 +66,7 @@ Expected parameter source: {invalidParameter?.Source.DisplayName}";
 
             var nullableUnderlyingType = Nullable.GetUnderlyingType(parameter.Type);
 
-            return nullableUnderlyingType.GetTypeInfo().IsEnum 
+            return nullableUnderlyingType?.GetTypeInfo().IsEnum == true
                 ? nullableUnderlyingType 
                 : null;
         }
