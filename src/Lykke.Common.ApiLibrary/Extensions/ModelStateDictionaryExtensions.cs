@@ -15,7 +15,7 @@ namespace Lykke.Common.ApiLibrary.Extensions
                     .Concat(state.Value.Errors
                         .Where(e => string.IsNullOrWhiteSpace(e.ErrorMessage))
                         .Select(e => e.Exception.Message))
-                    .ToList().FirstOrDefault();
+                    .FirstOrDefault();
 
                 if (string.IsNullOrEmpty(message))
                     continue;
