@@ -10,12 +10,11 @@ namespace Lykke.Common.ApiLibrary.Extensions
             foreach (var state in modelState)
             {
                 var message = state.Value.Errors
-                    .Where(e => !string.IsNullOrWhiteSpace(e.ErrorMessage))
-                    .Select(e => e.ErrorMessage)
-                    .Concat(state.Value.Errors
-                        .Where(e => string.IsNullOrWhiteSpace(e.ErrorMessage) && e.Exception != null)
-                        .Select(e => e.Exception.Message))
-                    .FirstOrDefault();
+                    .Select(e =>
+                        string.IsNullOrWhiteSpace(e.ErrorMessage)
+                            ? e.Exception?.Message
+                            : e.ErrorMessage
+                    ).FirstOrDefault(m => m != null);
 
                 if (string.IsNullOrEmpty(message))
                     continue;
