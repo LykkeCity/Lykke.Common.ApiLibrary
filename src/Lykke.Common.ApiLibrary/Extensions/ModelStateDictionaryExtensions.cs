@@ -13,7 +13,7 @@ namespace Lykke.Common.ApiLibrary.Extensions
                     .Where(e => !string.IsNullOrWhiteSpace(e.ErrorMessage))
                     .Select(e => e.ErrorMessage)
                     .Concat(state.Value.Errors
-                        .Where(e => string.IsNullOrWhiteSpace(e.ErrorMessage))
+                        .Where(e => string.IsNullOrWhiteSpace(e.ErrorMessage) && e.Exception != null)
                         .Select(e => e.Exception.Message))
                     .FirstOrDefault();
 
