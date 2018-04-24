@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using Common;
 using Common.Log;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Http;
@@ -11,6 +10,8 @@ namespace Lykke.Common.ApiLibrary.Middleware
 {
     public class GlobalErrorHandlerMiddleware
     {
+        private const int _partSize = 1024;
+
         private readonly ILog _log;
         private readonly string _componentName;
         private readonly CreateErrorResponse _createErrorResponse;
@@ -51,7 +52,7 @@ namespace Lykke.Common.ApiLibrary.Middleware
 
                 ms.Seek(0, SeekOrigin.Begin);
 
-                await _log.LogPartFromStream(ms, _componentName, context.Request.GetUri().AbsoluteUri, ex);
+                await LogPartFromStream(ms, context.Request.GetUri().AbsoluteUri, ex);
             }
         }
 
@@ -64,6 +65,24 @@ namespace Lykke.Common.ApiLibrary.Middleware
             var responseJson = JsonConvert.SerializeObject(response);
 
             await ctx.Response.WriteAsync(responseJson);
+        }
+
+        private async Task LogPartFromStream(
+            Stream stream,
+            string url,
+            Exception ex)
+        {
+            var len = (int)Math.Min(stream.Length, _partSize);
+            char[] bodyPart = new char[len];
+            stream.Seek(0, SeekOrigin.Begin);
+            using (var requestReader = new StreamReader(stream))
+            {
+                await requestReader.ReadAsync(bodyPart, 0, len);
+            }
+            string requestPart = new string(bodyPart);
+            int index = url.IndexOf('?');
+            string urlWithoutQuery = index == -1 ? url : url.Substring(0, index);
+            await _log.WriteErrorAsync(_componentName, urlWithoutQuery, $"{url}{Environment.NewLine}{requestPart}", ex);
         }
     }
 }
