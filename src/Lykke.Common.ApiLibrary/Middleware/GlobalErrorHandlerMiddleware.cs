@@ -72,12 +72,13 @@ namespace Lykke.Common.ApiLibrary.Middleware
             string url,
             Exception ex)
         {
-            stream.Seek(0, SeekOrigin.Begin);
-
-            var requestReader = new StreamReader(stream);
-            int len = (int)(stream.Length > _partSize ? _partSize : stream.Length);
+            var len = (int)Math.Min(stream.Length, _partSize);
             char[] bodyPart = new char[len];
-            await requestReader.ReadAsync(bodyPart, 0, len);
+            stream.Seek(0, SeekOrigin.Begin);
+            using (var requestReader = new StreamReader(stream))
+            {
+                await requestReader.ReadAsync(bodyPart, 0, len);
+            }
             string requestPart = new string(bodyPart);
             int index = url.IndexOf('?');
             string urlWithoutQuery = index == -1 ? url : url.Substring(0, index);
