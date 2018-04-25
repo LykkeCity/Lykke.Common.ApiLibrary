@@ -6,7 +6,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 namespace Lykke.Common.ApiLibrary.Swagger
 {
     /// <summary>
-    /// Replace string input operation parameter which mapper by swagger
+    /// Replaces string input operation parameter which mapper by swagger
     /// from IFormFile api parameter to file upload operation parameter.
     /// 
     /// IFormFile argument of controller's method should not be marked
