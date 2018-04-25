@@ -6,6 +6,11 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Common.ApiLibrary.Swagger
 {
+
+    /// <summary>
+    /// Replaces several operation parameters which mapper by swagger
+    /// from IFormFile api parameter to single file upload operation parameter 
+    /// </summary>
     public class FileUploadOperationFilter : IOperationFilter
     {
         private const string MultipartFormDataMimeType = "multipart/form-data";
