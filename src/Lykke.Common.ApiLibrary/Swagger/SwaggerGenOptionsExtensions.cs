@@ -71,7 +71,7 @@ namespace Lykke.Common.ApiLibrary.Swagger
             swaggerOptions.EnableXmsEnumExtension();
             swaggerOptions.EnableXmlDocumentation();
             swaggerOptions.MakeResponseValueTypesRequired();
-            swaggerOptions.OperationFilter<FileUploadOperationFilter>();
+            swaggerOptions.OperationFilter<FormFileUploadOperationFilter>();
         }
     }
 }
