@@ -1,12 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
+using JetBrains.Annotations;
+using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Common.ApiLibrary.Swagger.XmsEnum
 {
+    /// <summary>
+    /// Swagger schema filter, which applies x-ms-enum extension to the enum properties of the model schema
+    /// </summary>
+    [PublicAPI]
     public class XmsEnumSchemaFilter : ISchemaFilter
     {
         private readonly XmsEnumExtensionsOptions _options;
@@ -23,59 +27,24 @@ namespace Lykke.Common.ApiLibrary.Swagger.XmsEnum
                 return;
             }
 
-            var systemProperties = GetPublicProperties(context.SystemType);
+            var jsonContract = (JsonObjectContract)context.JsonContract;
+
+            if (jsonContract == null)
+            {
+                throw new InvalidOperationException($"JSON contract is not defined for type {context.SystemType}");
+            }
 
             foreach (var property in model.Properties.Where(x => x.Value.Enum != null))
             {
-                var systemProperty = systemProperties
-                    .SingleOrDefault(p => string.Equals(p.Name, property.Key, StringComparison.OrdinalIgnoreCase));
+                var jsonProperty = jsonContract.Properties?.GetProperty(property.Key, StringComparison.Ordinal);
 
-                if (systemProperty == null)
+                if (jsonProperty == null)
                 {
-                    throw new InvalidOperationException($"Property {property.Key} not found in type {context.SystemType}");
-                }
-                
-                XmsEnumExtensionApplicator.Apply(property.Value.Extensions, systemProperty.PropertyType, _options);
-            }
-        }
-
-        private static PropertyInfo[] GetPublicProperties(Type type)
-        {
-            if (type.GetTypeInfo().IsInterface)
-            {
-                var propertyInfos = new List<PropertyInfo>();
-                var considered = new List<Type>();
-                var queue = new Queue<Type>();
-
-                considered.Add(type);
-                queue.Enqueue(type);
-
-                while (queue.Count > 0)
-                {
-                    var subType = queue.Dequeue();
-                    foreach (var subInterface in subType.GetInterfaces())
-                    {
-                        if (considered.Contains(subInterface))
-                        {
-                            continue;
-                        }
-
-                        considered.Add(subInterface);
-                        queue.Enqueue(subInterface);
-                    }
-
-                    var typeProperties = subType.GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.Instance);
-
-                    var newPropertyInfos = typeProperties
-                        .Where(x => !propertyInfos.Contains(x));
-
-                    propertyInfos.InsertRange(0, newPropertyInfos);
+                    throw new InvalidOperationException($"Property {property.Key} not found in JSON contract for type {jsonContract.UnderlyingType}");
                 }
 
-                return propertyInfos.ToArray();
+                XmsEnumExtensionApplicator.Apply(property.Value.Extensions, jsonProperty.PropertyType, _options);
             }
-
-            return type.GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.Instance);
         }
     }
 }
