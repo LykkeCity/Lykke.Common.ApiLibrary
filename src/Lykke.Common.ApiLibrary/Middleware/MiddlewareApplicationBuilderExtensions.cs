@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -14,9 +15,20 @@ namespace Lykke.Common.ApiLibrary.Middleware
         /// <param name="app">Application builder</param>
         /// <param name="createGlobalErrorResponse">Create global error response delegate</param>
         /// <param name="logClientErrors">Enables logging of the requests with 4xx response codes</param>
-        public static void UseLykkeMiddleware(this IApplicationBuilder app, CreateErrorResponse createGlobalErrorResponse,
+        public static void UseLykkeMiddleware(
+            [NotNull] this IApplicationBuilder app, 
+            [NotNull] CreateErrorResponse createGlobalErrorResponse,
             bool logClientErrors = false)
         {
+            if (app == null)
+            {
+                throw new ArgumentNullException(nameof(app));
+            }
+            if (createGlobalErrorResponse == null)
+            {
+                throw new ArgumentNullException(nameof(createGlobalErrorResponse));
+            }
+
             app.Use(async (context, next) =>
             {
                 // enable ability to seek on request stream within any host,

@@ -1,43 +1,41 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
+using System.Text;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Http;
 
 namespace Lykke.Common.ApiLibrary.Middleware
 {
     internal static class RequestUtils
     {
-        public static async Task<string> GetRequestBodyAsync(HttpContext context)
+        public static async Task<string> GetRequestPartialBodyAsync(HttpContext context)
         {
+            if (context.Request?.Body == null)
+            {
+                return null;
+            }
+
             // request body might be already read at the moment 
             if (context.Request.Body.CanSeek)
             {
                 context.Request.Body.Seek(0, SeekOrigin.Begin);
             }
+            
+            const int maxBytesToRead = 1024 * 64;
+            var bodyBytes = new byte[maxBytesToRead];
+            var bodyBytesCount = await context.Request.Body.ReadAsync(bodyBytes, 0, maxBytesToRead);
 
-            using (var stream = new MemoryStream())
-            {
-                context.Request.Body.CopyTo(stream);
-
-                stream.Seek(0, SeekOrigin.Begin);
-
-                const int maxBodySize = 1024 * 64;
-                var len = (int)Math.Min(stream.Length, maxBodySize);
-                var bodyPart = new char[len];
-
-                stream.Seek(0, SeekOrigin.Begin);
-
-                using (var requestReader = new StreamReader(stream))
-                {
-                    await requestReader.ReadAsync(bodyPart, 0, len);
-
-                    return new string(bodyPart);
-                }
-            }
+            return Encoding.UTF8.GetString(bodyBytes, 0, bodyBytesCount);
         }
 
-        public static string GetUrlWithoutQuery(string url)
+        [CanBeNull]
+        public static string GetUrlWithoutQuery([CanBeNull] string url)
         {
+            if (url == null)
+            {
+                return null;
+            }
+
             var index = url.IndexOf('?');
             var urlWithoutQuery = index == -1 ? url : url.Substring(0, index);
 

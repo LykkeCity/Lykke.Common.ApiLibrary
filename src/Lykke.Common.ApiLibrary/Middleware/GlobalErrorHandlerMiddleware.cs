@@ -43,9 +43,9 @@ namespace Lykke.Common.ApiLibrary.Middleware
 
         private async Task LogError(HttpContext context, Exception ex)
         {
-            var url = context.Request.GetUri().AbsoluteUri;
-            var urlWithoutQuery = RequestUtils.GetUrlWithoutQuery(url);
-            var body = await RequestUtils.GetRequestBodyAsync(context);
+            var url = context.Request?.GetUri()?.AbsoluteUri;
+            var urlWithoutQuery = RequestUtils.GetUrlWithoutQuery(url) ?? "?";
+            var body = await RequestUtils.GetRequestPartialBodyAsync(context);
 
             _log.Error(urlWithoutQuery, ex, context: new
             {
