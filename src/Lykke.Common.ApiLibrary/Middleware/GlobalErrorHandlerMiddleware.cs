@@ -9,6 +9,9 @@ using Newtonsoft.Json;
 
 namespace Lykke.Common.ApiLibrary.Middleware
 {
+    /// <summary>
+    /// Middleware that handles all unhandled exceptions and use delegate to generate error response
+    /// </summary>
     [PublicAPI]
     public class GlobalErrorHandlerMiddleware
     {
@@ -16,6 +19,9 @@ namespace Lykke.Common.ApiLibrary.Middleware
         private readonly CreateErrorResponse _createErrorResponse;
         private readonly RequestDelegate _next;
 
+        /// <summary>
+        /// Middleware that handles all unhandled exceptions and use delegate to generate error response
+        /// </summary>
         public GlobalErrorHandlerMiddleware(RequestDelegate next, ILogFactory logFactory, CreateErrorResponse createErrorResponse)
         {
             if (logFactory == null)

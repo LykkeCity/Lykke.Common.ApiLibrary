@@ -10,7 +10,7 @@ namespace Lykke.Common.ApiLibrary.Middleware
     {
         public static async Task<string> GetRequestPartialBodyAsync(HttpContext context)
         {
-            if (context.Request?.Body == null)
+            if (context?.Request?.Body == null)
             {
                 return null;
             }
@@ -21,6 +21,7 @@ namespace Lykke.Common.ApiLibrary.Middleware
                 context.Request.Body.Seek(0, SeekOrigin.Begin);
             }
             
+            // 64 Kb - is max size for the azure queue message
             const int maxBytesToRead = 1024 * 64;
             var bodyBytes = new byte[maxBytesToRead];
             var bodyBytesCount = await context.Request.Body.ReadAsync(bodyBytes, 0, maxBytesToRead);

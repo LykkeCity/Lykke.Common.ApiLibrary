@@ -8,12 +8,18 @@ using Microsoft.AspNetCore.Http;
 
 namespace Lykke.Common.ApiLibrary.Middleware
 {
+    /// <summary>
+    /// Logs url, request body and response status for responses with status code = 4xx
+    /// </summary>
     [PublicAPI]
     public class ClientErrorHandlerMiddleware
     {
         private readonly ILog _log;
         private readonly RequestDelegate _next;
 
+        /// <summary>
+        /// Logs url, request body and response status for responses with status code = 4xx
+        /// </summary>
         public ClientErrorHandlerMiddleware(RequestDelegate next, ILogFactory logFactory)
         {
             if (logFactory == null)
