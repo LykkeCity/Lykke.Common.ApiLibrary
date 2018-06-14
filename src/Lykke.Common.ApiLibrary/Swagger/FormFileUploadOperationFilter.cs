@@ -1,5 +1,5 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
+using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -7,33 +7,39 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 namespace Lykke.Common.ApiLibrary.Swagger
 {
     /// <summary>
-    /// Replaces string input operation parameter which mapper by swagger
-    /// from IFormFile api parameter to file upload operation parameter.
-    /// 
-    /// IFormFile argument of controller's method should not be marked
-    /// by binding attribute such as [FromForm], [FromBody] or etc.
+    /// Replaces splited or single file upload parameters to 
+    /// file upload field in a swagger
     /// </summary>
     public class FormFileUploadOperationFilter : IOperationFilter
     {
+        private const string MultipartFormDataMimeType = "multipart/form-data";
+
+        private static readonly string[] FormFilePropertyNames = typeof(IFormFile)
+            .GetTypeInfo()
+            .DeclaredProperties
+            .Select(x => x.Name)
+            .ToArray();
+
         public void Apply(Operation operation, OperationFilterContext context)
         {
-            var descriptions = context.ApiDescription.ParameterDescriptions
-                .Where(x => x.ParameterDescriptor.ParameterType == typeof(IFormFile))
+            var descriptions = context.ApiDescription.ActionDescriptor.Parameters
+                .Where(x => x.ParameterType == typeof(IFormFile))
                 .ToArray();
 
-            if (descriptions.Any(x => x.Source.Id != "FormFile"))
+            if (!descriptions.Any())
             {
-                throw new InvalidOperationException("IFormFile argument of controller's method should not be marked " +
-                                                    "by binding attribute such as [FromForm], [FromBody] or etc. " +
-                                                    "to be compatible with swagger");
+                return;
             }
 
-            if (descriptions.Any())
+            if (!operation.Consumes.Contains(MultipartFormDataMimeType))
             {
-                operation.Consumes.Add("application/form-data");
+                operation.Consumes.Add(MultipartFormDataMimeType);
             }
 
-            foreach (var description in descriptions)
+            var greedyDescriptions = descriptions
+                .Where(x => x.BindingInfo?.BindingSource?.IsGreedy == true);
+            
+            foreach (var description in greedyDescriptions)
             {
                 var oldParameter = operation.Parameters.First(o => o.Name == description.Name);
                 var parameterIndex = operation.Parameters.IndexOf(oldParameter);
@@ -48,6 +54,44 @@ namespace Lykke.Common.ApiLibrary.Swagger
                 };
 
                 operation.Parameters[parameterIndex] = newParameter;
+            }
+
+            var notGreedyDescriptions = descriptions
+                .Where(x => x.BindingInfo?.BindingSource?.IsGreedy != true);
+
+            foreach (var description in notGreedyDescriptions)
+            {
+                var fileParameter = new NonBodyParameter
+                {
+                    Name = description.Name,
+                    In = "formData",
+                    Required = false,
+                    Type = "file"
+                };
+
+                var firstNestedFileParameter = operation
+                    .Parameters
+                    .OfType<NonBodyParameter>()
+                    .FirstOrDefault(x => FormFilePropertyNames.Contains(x.Name));
+
+                if (firstNestedFileParameter == null)
+                {
+                    break;
+                }
+
+                var fileParameterIndex = operation
+                    .Parameters
+                    .IndexOf(firstNestedFileParameter);
+
+                foreach (var propertyName in FormFilePropertyNames)
+                {
+                    var parameter = operation.Parameters.First(x => x.Name.Contains(propertyName));
+                    operation.Parameters.Remove(parameter);
+                }
+
+                operation
+                    .Parameters
+                    .Insert(fileParameterIndex, fileParameter);
             }
         }
     }
