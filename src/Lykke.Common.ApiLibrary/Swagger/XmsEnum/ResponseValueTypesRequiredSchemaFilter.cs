@@ -1,12 +1,17 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using JetBrains.Annotations;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Common.ApiLibrary.Swagger.XmsEnum
 {
-    public class ResponseValueTypesRequiredSchemaFilter : ISchemaFilter
+    /// <summary>
+    /// Warning. It affects not only responses but also requests
+    /// </summary>
+    [UsedImplicitly]
+    internal class ResponseValueTypesRequiredSchemaFilter : ISchemaFilter
     {
         public void Apply(Schema schema, SchemaFilterContext context)
         {
@@ -26,7 +31,7 @@ namespace Lykke.Common.ApiLibrary.Swagger.XmsEnum
                 .Select(p => p.Name);
 
             schema.Required = schema.Properties.Keys
-                .Intersect(nonNulableValueTypedPropNames, StringComparer.OrdinalIgnoreCase)
+                .Union(nonNulableValueTypedPropNames, StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
             if (!schema.Required.Any())
