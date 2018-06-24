@@ -1,20 +1,34 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using JetBrains.Annotations;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.HttpOverrides;
 
 namespace Lykke.Common.ApiLibrary.Middleware
 {
+    [PublicAPI]
     public static class MiddlewareApplicationBuilderExtensions
     {
         /// <summary>
         /// Configure application to use standart Lykke middleware
         /// </summary>
         /// <param name="app">Application builder</param>
-        /// <param name="componentName">Component name for logs</param>
         /// <param name="createGlobalErrorResponse">Create global error response delegate</param>
-        public static void UseLykkeMiddleware(this IApplicationBuilder app, string componentName, CreateErrorResponse createGlobalErrorResponse,
+        /// <param name="logClientErrors">Enables logging of the requests with 4xx response codes</param>
+        public static void UseLykkeMiddleware(
+            [NotNull] this IApplicationBuilder app, 
+            [NotNull] CreateErrorResponse createGlobalErrorResponse,
             bool logClientErrors = false)
         {
+            if (app == null)
+            {
+                throw new ArgumentNullException(nameof(app));
+            }
+            if (createGlobalErrorResponse == null)
+            {
+                throw new ArgumentNullException(nameof(createGlobalErrorResponse));
+            }
+
             app.Use(async (context, next) =>
             {
                 // enable ability to seek on request stream within any host,
@@ -23,11 +37,11 @@ namespace Lykke.Common.ApiLibrary.Middleware
                 await next();
             });
 
-            app.UseMiddleware<GlobalErrorHandlerMiddleware>(componentName, createGlobalErrorResponse);
+            app.UseMiddleware<GlobalErrorHandlerMiddleware>(createGlobalErrorResponse);
 
             if (logClientErrors)
             {
-                app.UseMiddleware<ClientErrorHandlerMiddleware>(componentName);
+                app.UseMiddleware<ClientErrorHandlerMiddleware>();
             }
         }
         

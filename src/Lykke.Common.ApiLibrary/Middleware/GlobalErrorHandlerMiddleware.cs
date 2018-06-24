@@ -1,26 +1,35 @@
 ﻿using System;
-using System.IO;
 using System.Threading.Tasks;
 using Common.Log;
+using JetBrains.Annotations;
+using Lykke.Common.Log;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
 namespace Lykke.Common.ApiLibrary.Middleware
 {
+    /// <summary>
+    /// Middleware that handles all unhandled exceptions and use delegate to generate error response
+    /// </summary>
+    [PublicAPI]
     public class GlobalErrorHandlerMiddleware
     {
-        private const int _partSize = 1024;
-
         private readonly ILog _log;
-        private readonly string _componentName;
         private readonly CreateErrorResponse _createErrorResponse;
         private readonly RequestDelegate _next;
 
-        public GlobalErrorHandlerMiddleware(RequestDelegate next, ILog log, string componentName, CreateErrorResponse createErrorResponse)
+        /// <summary>
+        /// Middleware that handles all unhandled exceptions and use delegate to generate error response
+        /// </summary>
+        public GlobalErrorHandlerMiddleware(RequestDelegate next, ILogFactory logFactory, CreateErrorResponse createErrorResponse)
         {
-            _log = log ?? throw new ArgumentNullException(nameof(log));
-            _componentName = componentName ?? throw new ArgumentNullException(nameof(componentName));
+            if (logFactory == null)
+            {
+                throw new ArgumentNullException(nameof(logFactory));
+            }
+
+            _log = logFactory.CreateLog(this);
             _createErrorResponse = createErrorResponse ?? throw new ArgumentNullException(nameof(createErrorResponse));
             _next = next;
         }
@@ -40,20 +49,15 @@ namespace Lykke.Common.ApiLibrary.Middleware
 
         private async Task LogError(HttpContext context, Exception ex)
         {
-            // request body might be already read at the moment 
-            if (context.Request.Body.CanSeek)
+            var url = context.Request?.GetUri()?.AbsoluteUri;
+            var urlWithoutQuery = RequestUtils.GetUrlWithoutQuery(url) ?? "?";
+            var body = await RequestUtils.GetRequestPartialBodyAsync(context);
+
+            _log.Error(urlWithoutQuery, ex, context: new
             {
-                context.Request.Body.Seek(0, SeekOrigin.Begin);
-            }
-
-            using (var ms = new MemoryStream())
-            {
-                context.Request.Body.CopyTo(ms);
-
-                ms.Seek(0, SeekOrigin.Begin);
-
-                await LogPartFromStream(ms, context.Request.GetUri().AbsoluteUri, ex);
-            }
+                url = url,
+                body = body
+            });
         }
 
         private async Task CreateErrorResponse(HttpContext ctx, Exception ex)
@@ -65,24 +69,6 @@ namespace Lykke.Common.ApiLibrary.Middleware
             var responseJson = JsonConvert.SerializeObject(response);
 
             await ctx.Response.WriteAsync(responseJson);
-        }
-
-        private async Task LogPartFromStream(
-            Stream stream,
-            string url,
-            Exception ex)
-        {
-            var len = (int)Math.Min(stream.Length, _partSize);
-            char[] bodyPart = new char[len];
-            stream.Seek(0, SeekOrigin.Begin);
-            using (var requestReader = new StreamReader(stream))
-            {
-                await requestReader.ReadAsync(bodyPart, 0, len);
-            }
-            string requestPart = new string(bodyPart);
-            int index = url.IndexOf('?');
-            string urlWithoutQuery = index == -1 ? url : url.Substring(0, index);
-            await _log.WriteErrorAsync(_componentName, urlWithoutQuery, $"{url}{Environment.NewLine}{requestPart}", ex);
         }
     }
 }
