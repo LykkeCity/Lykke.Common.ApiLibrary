@@ -28,8 +28,8 @@ namespace Lykke.Common.ApiLibrary.Middleware
             }
 
             _log = log.CreateComponentScope(componentName);
-            _createErrorResponse = createErrorResponse ?? throw new ArgumentNullException(nameof(createErrorResponse));	            
-            _next = next;	             _next = next;
+            _createErrorResponse = createErrorResponse ?? throw new ArgumentNullException(nameof(createErrorResponse));
+            _next = next;
         }
 
         /// <summary>

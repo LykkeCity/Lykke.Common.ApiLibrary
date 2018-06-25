@@ -34,15 +34,17 @@ namespace Lykke.Common.ApiLibrary.Middleware
                 await next();
             });
 
+            var log = app.ApplicationServices.GetRequiredService<ILog>();
+
             app.UseMiddleware<GlobalErrorHandlerMiddleware>(
-                app.ApplicationServices.GetRequiredService<ILog>(),
+                log,
                 componentName, 
                 createGlobalErrorResponse);
 
             if (logClientErrors)
             {
                 app.UseMiddleware<ClientErrorHandlerMiddleware>(
-                    app.ApplicationServices.GetRequiredService<ILog>(),
+                    log,
                     componentName);
             }
         }
@@ -75,13 +77,15 @@ namespace Lykke.Common.ApiLibrary.Middleware
                 await next();
             });
 
+            var logFactory = app.ApplicationServices.GetRequiredService<ILogFactory>();
+
             app.UseMiddleware<GlobalErrorHandlerMiddleware>(
-                app.ApplicationServices.GetRequiredService<ILogFactory>(),
+                logFactory,
                 createGlobalErrorResponse);
 
             if (logClientErrors)
             {
-                app.UseMiddleware<ClientErrorHandlerMiddleware>(app.ApplicationServices.GetRequiredService<ILogFactory>());
+                app.UseMiddleware<ClientErrorHandlerMiddleware>(logFactory);
             }
         }
         
