@@ -17,6 +17,18 @@ namespace Lykke.Common.ApiLibrary.Middleware
         private readonly ILog _log;
         private readonly RequestDelegate _next;
 
+        [Obsolete]
+        public ClientErrorHandlerMiddleware(RequestDelegate next, ILog log, string componentName)
+        {
+            if (log == null)
+            {
+                throw new ArgumentNullException(nameof(log));
+            }
+
+            _log = log.CreateComponentScope(componentName);
+            _next = next;
+        }
+
         /// <summary>
         /// Logs url, request body and response status for responses with status code = 4xx
         /// </summary>
@@ -48,12 +60,13 @@ namespace Lykke.Common.ApiLibrary.Middleware
             var urlWithoutQuery = RequestUtils.GetUrlWithoutQuery(url) ?? "?";
             var body = await RequestUtils.GetRequestPartialBodyAsync(context);
 
-            _log.Warning(urlWithoutQuery, message: null, context: new
-            {
-                url = url,
-                statusCode = context.Response.StatusCode,
-                body = body
-            });
+            _log.WriteWarning(urlWithoutQuery, new
+                {
+                    url = url,
+                    statusCode = context.Response.StatusCode,
+                    body = body
+                },
+                "");
         }
     }
 }

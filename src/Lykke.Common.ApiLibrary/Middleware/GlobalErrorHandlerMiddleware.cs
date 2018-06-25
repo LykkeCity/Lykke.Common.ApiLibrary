@@ -19,6 +19,19 @@ namespace Lykke.Common.ApiLibrary.Middleware
         private readonly CreateErrorResponse _createErrorResponse;
         private readonly RequestDelegate _next;
 
+        [Obsolete]
+        public GlobalErrorHandlerMiddleware(RequestDelegate next, ILog log, string componentName, CreateErrorResponse createErrorResponse)
+        {
+            if (log == null)
+            {
+                throw new ArgumentNullException(nameof(log));
+            }
+
+            _log = log.CreateComponentScope(componentName);
+            _createErrorResponse = createErrorResponse ?? throw new ArgumentNullException(nameof(createErrorResponse));	            
+            _next = next;	             _next = next;
+        }
+
         /// <summary>
         /// Middleware that handles all unhandled exceptions and use delegate to generate error response
         /// </summary>
@@ -53,11 +66,12 @@ namespace Lykke.Common.ApiLibrary.Middleware
             var urlWithoutQuery = RequestUtils.GetUrlWithoutQuery(url) ?? "?";
             var body = await RequestUtils.GetRequestPartialBodyAsync(context);
 
-            _log.Error(urlWithoutQuery, ex, context: new
-            {
-                url = url,
-                body = body
-            });
+            _log.WriteError(urlWithoutQuery, new
+                {
+                    url = url,
+                    body = body
+                },
+                ex);
         }
 
         private async Task CreateErrorResponse(HttpContext ctx, Exception ex)
