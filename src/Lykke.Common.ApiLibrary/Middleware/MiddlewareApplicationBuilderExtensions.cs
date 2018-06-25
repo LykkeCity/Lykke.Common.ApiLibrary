@@ -1,14 +1,54 @@
 ﻿using System;
+using Common.Log;
 using JetBrains.Annotations;
+using Lykke.Common.Log;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Lykke.Common.ApiLibrary.Middleware
 {
     [PublicAPI]
     public static class MiddlewareApplicationBuilderExtensions
     {
+        /// <summary>
+        /// Configure application to use standart Lykke middleware
+        /// </summary>
+        /// <param name="app">Application builder</param>
+        /// <param name="componentName">Component name for logs</param>
+        /// <param name="createGlobalErrorResponse">Create global error response delegate</param>
+        /// <param name="logClientErrors">log 4xx errors</param>
+        [Obsolete]
+        public static void UseLykkeMiddleware(
+            this IApplicationBuilder app, 
+            string componentName, 
+            CreateErrorResponse createGlobalErrorResponse,
+            bool logClientErrors = false)
+        {
+            app.Use(async (context, next) =>
+            {
+                // enable ability to seek on request stream within any host,
+                // but not only Kestrel, for any subsequent middleware
+                context.Request.EnableRewind();
+                await next();
+            });
+
+            var log = app.ApplicationServices.GetRequiredService<ILog>();
+
+            app.UseMiddleware<GlobalErrorHandlerMiddleware>(
+                log,
+                componentName, 
+                createGlobalErrorResponse);
+
+            if (logClientErrors)
+            {
+                app.UseMiddleware<ClientErrorHandlerMiddleware>(
+                    log,
+                    componentName);
+            }
+        }
+
         /// <summary>
         /// Configure application to use standart Lykke middleware
         /// </summary>
@@ -37,11 +77,15 @@ namespace Lykke.Common.ApiLibrary.Middleware
                 await next();
             });
 
-            app.UseMiddleware<GlobalErrorHandlerMiddleware>(createGlobalErrorResponse);
+            var logFactory = app.ApplicationServices.GetRequiredService<ILogFactory>();
+
+            app.UseMiddleware<GlobalErrorHandlerMiddleware>(
+                logFactory,
+                createGlobalErrorResponse);
 
             if (logClientErrors)
             {
-                app.UseMiddleware<ClientErrorHandlerMiddleware>();
+                app.UseMiddleware<ClientErrorHandlerMiddleware>(logFactory);
             }
         }
         
