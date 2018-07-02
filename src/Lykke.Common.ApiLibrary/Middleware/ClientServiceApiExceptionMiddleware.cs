@@ -24,17 +24,17 @@ namespace Lykke.Common.ApiLibrary.Middleware
             }
             catch (ValidationApiException exception)
             {
-                await CreateErrorResponse(context, exception.Message, exception.StatusCode);
+                await CreateErrorResponse(context, exception.ErrorResponse, exception.StatusCode);
             }
         }
         
-        private static async Task CreateErrorResponse(HttpContext ctx, string message, HttpStatusCode status)
+        private static async Task CreateErrorResponse(HttpContext ctx, ErrorResponse response, HttpStatusCode status)
         {
             ctx.Response.Clear();
             ctx.Response.ContentType = "application/json";
             ctx.Response.StatusCode = (int)status;
             
-            var json = JsonConvert.SerializeObject(ErrorResponse.Create(message));
+            var json = JsonConvert.SerializeObject(response);
 
             await ctx.Response.WriteAsync(json);
         }
