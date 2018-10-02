@@ -66,7 +66,7 @@ namespace Lykke.Common.ApiLibrary.Middleware
                     statusCode = context.Response.StatusCode,
                     body = body
                 },
-                "");
+                "Client request error");
         }
     }
 }
