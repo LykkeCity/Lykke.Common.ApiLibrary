@@ -20,7 +20,7 @@ namespace Lykke.Common.ApiLibrary.Swagger.XmsEnum
                 return;
             }
 
-            var nonNulableValueTypedPropNames = context.SystemType.GetProperties()
+            var nonNullableValueTypedPropNames = context.SystemType.GetProperties()
                 .Where(p =>
                     // is it value type?
                     p.PropertyType.GetTypeInfo().IsValueType &&
@@ -30,9 +30,9 @@ namespace Lykke.Common.ApiLibrary.Swagger.XmsEnum
                     p.CanRead && p.CanWrite)
                 .Select(p => p.Name);
 
-            schema.Required = schema.Properties.Keys
-                .Union(nonNulableValueTypedPropNames, StringComparer.OrdinalIgnoreCase)
-                .ToList();
+            schema.Required = schema.Required == null
+                ? nonNullableValueTypedPropNames.ToList()
+                : schema.Required.Union(nonNullableValueTypedPropNames, StringComparer.OrdinalIgnoreCase).ToList();
 
             if (!schema.Required.Any())
             {
