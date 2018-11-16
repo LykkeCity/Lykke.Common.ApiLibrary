@@ -1,7 +1,6 @@
 using System.IO;
 using System.Reflection;
 using Lykke.Common.ApiLibrary.Swagger.XmsEnum;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.PlatformAbstractions;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
