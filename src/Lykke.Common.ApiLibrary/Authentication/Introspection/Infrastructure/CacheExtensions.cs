@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using IdentityModel;
+using Lykke.Common.ApiLibrary.Extensions;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -27,7 +28,7 @@ namespace Lykke.Common.ApiLibrary.Authentication.Introspection.Infrastructure
 
             if (bytes == null)
             {
-                return null;
+                return new List<Claim>();
             }
 
             var json = Encoding.UTF8.GetString(bytes);

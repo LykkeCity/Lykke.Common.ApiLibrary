@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using IdentityModel.Client;
 using Lykke.Common.ApiLibrary.Authentication.Introspection.Infrastructure;
+using Lykke.Common.ApiLibrary.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
@@ -73,7 +75,7 @@ namespace Lykke.Common.ApiLibrary.Authentication.Introspection
             {
                 var key = $"{Options.CacheKeyPrefix}{token}";
                 var claims = await _cache.GetClaimsAsync(key).ConfigureAwait(false);
-                if (claims != null)
+                if (claims.Any())
                 {
                     var ticket = await CreateTicket(claims);
 

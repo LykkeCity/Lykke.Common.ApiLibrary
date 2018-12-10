@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using IdentityModel.Client;
 using Lykke.Common.ApiLibrary.Authentication.Introspection.Infrastructure;
+using Lykke.Common.ApiLibrary.Extensions;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 

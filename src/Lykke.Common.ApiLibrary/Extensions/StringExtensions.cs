@@ -3,21 +3,10 @@ using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Lykke.Common.ApiLibrary.Authentication.Introspection.Infrastructure
+namespace Lykke.Common.ApiLibrary.Extensions
 {
     internal static class StringExtensions
     {
-        [DebuggerStepThrough]
-        public static string EnsureTrailingSlash(this string input)
-        {
-            if (!input.EndsWith("/"))
-            {
-                return input + "/";
-            }
-
-            return input;
-        }
-
         [DebuggerStepThrough]
         public static bool IsMissing(this string value)
         {

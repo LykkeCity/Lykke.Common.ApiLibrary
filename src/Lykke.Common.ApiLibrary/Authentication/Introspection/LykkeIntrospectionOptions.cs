@@ -4,6 +4,7 @@ using System.Net.Http;
 using IdentityModel;
 using IdentityModel.Client;
 using Lykke.Common.ApiLibrary.Authentication.Introspection.Infrastructure;
+using Lykke.Common.ApiLibrary.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 
