@@ -2,7 +2,6 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Common.Log;
-using Lykke.Common.ApiLibrary.Middleware;
 using Lykke.Common.ApiLibrary.Swagger;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Serialization;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace TestWebService
 {
@@ -74,15 +72,12 @@ namespace TestWebService
             }
 
             app.UseMvc();
+
             app.UseSwagger(c =>
             {
                 c.PreSerializeFilters.Add((swagger, httpReq) => swagger.Host = httpReq.Host.Value);
             });
-            app.UseSwaggerUI(x =>
-            {
-                x.RoutePrefix = "swagger/ui";
-                x.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-            });
+            
             app.UseStaticFiles();
         }
     }
