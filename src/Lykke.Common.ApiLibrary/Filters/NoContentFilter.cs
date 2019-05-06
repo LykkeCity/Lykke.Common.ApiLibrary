@@ -2,6 +2,7 @@
 using JetBrains.Annotations;
 using Lykke.Common.Log;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Lykke.Common.ApiLibrary.Filters
@@ -28,10 +29,14 @@ namespace Lykke.Common.ApiLibrary.Filters
             var response = context.HttpContext.Response;
             if (response.StatusCode == StatusCodes.Status200OK && (response.ContentLength ?? 0) == 0)
             {
-                if (response.HasStarted)
-                    _log.Warning($"Couldn't set NoContent into response to {context.HttpContext.Request.Method} {context.HttpContext.Request.Path}");
-                else
-                    response.StatusCode = StatusCodes.Status204NoContent;
+                var okResult = context.Result as OkObjectResult;
+                if (okResult?.Value == null)
+                {
+                    if (response.HasStarted)
+                        _log.Warning($"Couldn't set NoContent into response to {context.HttpContext.Request.Method} {context.HttpContext.Request.Path}");
+                    else
+                        response.StatusCode = StatusCodes.Status204NoContent;
+                }
             }
         }
     }
