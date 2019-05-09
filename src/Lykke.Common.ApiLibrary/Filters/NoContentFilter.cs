@@ -29,7 +29,7 @@ namespace Lykke.Common.ApiLibrary.Filters
             var response = context.HttpContext.Response;
             if (response.StatusCode == StatusCodes.Status200OK && (response.ContentLength ?? 0) == 0)
             {
-                var okResult = context.Result as OkObjectResult;
+                var okResult = context.Result as ObjectResult;
                 if (okResult?.Value == null)
                 {
                     if (response.HasStarted)
