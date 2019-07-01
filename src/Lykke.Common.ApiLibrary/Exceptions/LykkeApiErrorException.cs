@@ -90,6 +90,23 @@ namespace Lykke.Common.ApiLibrary.Exceptions
             return new LykkeApiErrorException(HttpStatusCode.Forbidden, lykkeApiErrorCode, message);
         }
 
+        /// <summary>
+        ///     Create a 401 Unauthorized error
+        /// </summary>
+        /// <param name="lykkeApiErrorCode">
+        ///     Error code identifying what kind of error happened.</param>
+        /// <param name="message">
+        ///     Message to include in response.</param>
+        /// <returns>
+        ///     New <see cref="LykkeApiErrorException" /> with <see cref="StatusCode" /> set to
+        ///     <see cref="HttpStatusCode.Unauthorized" />.
+        /// </returns>
+        public static LykkeApiErrorException Unauthorized(ILykkeApiErrorCode lykkeApiErrorCode,
+            string message = "")
+        {
+            return new LykkeApiErrorException(HttpStatusCode.Unauthorized, lykkeApiErrorCode, message);
+        }
+
         private static string GetMessage(ILykkeApiErrorCode lykkeApiErrorCode, string message)
         {
             if (lykkeApiErrorCode == null)
