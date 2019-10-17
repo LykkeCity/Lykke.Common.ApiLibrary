@@ -26,14 +26,17 @@ namespace Lykke.Common.ApiLibrary.Filters
 
         public void OnResultExecuted(ResultExecutedContext context)
         {
+            var request = context.HttpContext.Request;
             var response = context.HttpContext.Response;
-            if (response.StatusCode == StatusCodes.Status200OK && (response.ContentLength ?? 0) == 0)
+            if (response.StatusCode == StatusCodes.Status200OK
+                && (response.ContentLength ?? 0) == 0
+                && request.Path.StartsWithSegments("/api"))
             {
                 var okResult = context.Result as ObjectResult;
                 if (okResult?.Value == null)
                 {
                     if (response.HasStarted)
-                        _log.Warning($"Couldn't set NoContent into response to {context.HttpContext.Request.Method} {context.HttpContext.Request.Path}");
+                        _log.Warning($"Couldn't set NoContent into response to {request.Method} {request.Path}");
                     else
                         response.StatusCode = StatusCodes.Status204NoContent;
                 }
