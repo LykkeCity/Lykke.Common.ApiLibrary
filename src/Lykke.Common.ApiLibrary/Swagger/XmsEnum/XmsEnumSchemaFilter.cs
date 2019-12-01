@@ -27,7 +27,8 @@ namespace Lykke.Common.ApiLibrary.Swagger.XmsEnum
                 return;
             }
 
-            var jsonContract = (JsonObjectContract)context.JsonContract;
+            if (!(context.JsonContract is JsonObjectContract jsonContract))
+                return;
 
             if (jsonContract == null)
             {
