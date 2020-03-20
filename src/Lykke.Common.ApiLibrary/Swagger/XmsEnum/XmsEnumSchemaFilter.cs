@@ -1,8 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using JetBrains.Annotations;
-using Newtonsoft.Json.Serialization;
-using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Common.ApiLibrary.Swagger.XmsEnum
@@ -20,31 +18,14 @@ namespace Lykke.Common.ApiLibrary.Swagger.XmsEnum
             _options = options;
         }
 
-        public void Apply(Schema model, SchemaFilterContext context)
+        public void Apply(OpenApiSchema model, SchemaFilterContext context)
         {
             if (model.Properties == null)
-            {
                 return;
-            }
-
-            if (!(context.JsonContract is JsonObjectContract jsonContract))
-                return;
-
-            if (jsonContract == null)
-            {
-                throw new InvalidOperationException($"JSON contract is not defined for type {context.SystemType}");
-            }
 
             foreach (var property in model.Properties.Where(x => x.Value.Enum != null))
             {
-                var jsonProperty = jsonContract.Properties?.GetProperty(property.Key, StringComparison.Ordinal);
-
-                if (jsonProperty == null)
-                {
-                    throw new InvalidOperationException($"Property {property.Key} not found in JSON contract for type {jsonContract.UnderlyingType}");
-                }
-
-                XmsEnumExtensionApplicator.Apply(property.Value.Extensions, jsonProperty.PropertyType, _options);
+                XmsEnumExtensionApplicator.Apply(property.Value.Extensions, property.Value.Type, _options);
             }
         }
     }

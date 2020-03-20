@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Common.Log;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 
 namespace TestWebService
@@ -75,9 +77,13 @@ namespace TestWebService
 
             app.UseSwagger(c =>
             {
-                c.PreSerializeFilters.Add((swagger, httpReq) => swagger.Host = httpReq.Host.Value);
+                c.PreSerializeFilters.Add((swagger, httpReq) =>
+                    swagger.Servers = new List<OpenApiServer>
+                    {
+                        new OpenApiServer { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}" }
+                    });
             });
-            
+
             app.UseStaticFiles();
         }
     }

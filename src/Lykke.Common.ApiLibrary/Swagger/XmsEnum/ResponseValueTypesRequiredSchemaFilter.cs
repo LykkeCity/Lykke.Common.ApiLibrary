@@ -2,7 +2,8 @@ using System;
 using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
-using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.OpenApi.Models;
+using MoreLinq;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Common.ApiLibrary.Swagger.XmsEnum
@@ -13,14 +14,14 @@ namespace Lykke.Common.ApiLibrary.Swagger.XmsEnum
     [UsedImplicitly]
     internal class ResponseValueTypesRequiredSchemaFilter : ISchemaFilter
     {
-        public void Apply(Schema schema, SchemaFilterContext context)
+        public void Apply(OpenApiSchema schema, SchemaFilterContext context)
         {
             if (schema.Type != "object" || schema.Properties == null)
             {
                 return;
             }
 
-            var nonNullableValueTypedPropNames = context.SystemType.GetProperties()
+            var nonNullableValueTypedPropNames = context.Type.GetProperties()
                 .Where(p =>
                     // is it value type?
                     p.PropertyType.GetTypeInfo().IsValueType &&
@@ -31,8 +32,8 @@ namespace Lykke.Common.ApiLibrary.Swagger.XmsEnum
                 .Select(p => p.Name);
 
             schema.Required = schema.Required == null
-                ? nonNullableValueTypedPropNames.ToList()
-                : schema.Required.Union(nonNullableValueTypedPropNames, StringComparer.OrdinalIgnoreCase).ToList();
+                ? nonNullableValueTypedPropNames.ToHashSet()
+                : schema.Required.Union(nonNullableValueTypedPropNames, StringComparer.OrdinalIgnoreCase).ToHashSet();
 
             if (!schema.Required.Any())
             {
