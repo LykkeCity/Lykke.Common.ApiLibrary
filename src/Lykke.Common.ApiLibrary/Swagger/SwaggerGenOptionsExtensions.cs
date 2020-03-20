@@ -3,7 +3,7 @@ using System.Reflection;
 using Lykke.Common.ApiLibrary.Swagger.XmsEnum;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.PlatformAbstractions;
-using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Common.ApiLibrary.Swagger
@@ -62,7 +62,7 @@ namespace Lykke.Common.ApiLibrary.Swagger
         {
             swaggerOptions.SwaggerDoc(
                 $"{apiVersion}",
-                new Info
+                new OpenApiInfo
                 {
                     Version = apiVersion,
                     Title = apiTitle
@@ -72,7 +72,6 @@ namespace Lykke.Common.ApiLibrary.Swagger
             swaggerOptions.EnableXmsEnumExtension();
             swaggerOptions.EnableXmlDocumentation();
             swaggerOptions.MakeResponseValueTypesRequired();
-            swaggerOptions.OperationFilter<FormFileUploadOperationFilter>();
         }
     }
 }

@@ -66,12 +66,14 @@ namespace Lykke.Common.ApiLibrary.Middleware
             var urlWithoutQuery = RequestUtils.GetUrlWithoutQuery(url) ?? "?";
             var body = await RequestUtils.GetRequestPartialBodyAsync(context);
 
-            _log.WriteError(urlWithoutQuery, new
+            _log.Error(
+                ex,
+                context: new
                 {
-                    url = url,
-                    body = body
+                    url,
+                    body
                 },
-                ex);
+                process: urlWithoutQuery);
         }
 
         private async Task CreateErrorResponse(HttpContext ctx, Exception ex)
