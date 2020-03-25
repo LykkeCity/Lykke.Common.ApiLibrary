@@ -3,7 +3,6 @@ using Common.Log;
 using JetBrains.Annotations;
 using Lykke.Common.Log;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -88,7 +87,7 @@ namespace Lykke.Common.ApiLibrary.Middleware
                 app.UseMiddleware<ClientErrorHandlerMiddleware>(logFactory);
             }
         }
-        
+
         /// <summary>
         /// Configure application to use forwarded headers
         /// </summary>
@@ -99,10 +98,10 @@ namespace Lykke.Common.ApiLibrary.Middleware
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost
             };
-                
+
             forwardingOptions.KnownNetworks.Clear(); //its loopback by default
             forwardingOptions.KnownProxies.Clear();
-            
+
             app.UseForwardedHeaders(forwardingOptions);
         }
     }
