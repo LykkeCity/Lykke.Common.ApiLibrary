@@ -18,6 +18,7 @@ namespace Lykke.Common.ApiLibrary.Middleware
         private readonly ILog _log;
         private readonly CreateErrorResponse _createErrorResponse;
         private readonly RequestDelegate _next;
+        private readonly bool _useOldLog;
 
         [Obsolete]
         public GlobalErrorHandlerMiddleware(RequestDelegate next, ILog log, string componentName, CreateErrorResponse createErrorResponse)
@@ -30,6 +31,7 @@ namespace Lykke.Common.ApiLibrary.Middleware
             _log = log.CreateComponentScope(componentName);
             _createErrorResponse = createErrorResponse ?? throw new ArgumentNullException(nameof(createErrorResponse));
             _next = next;
+            _useOldLog = true;
         }
 
         /// <summary>
@@ -45,6 +47,7 @@ namespace Lykke.Common.ApiLibrary.Middleware
             _log = logFactory.CreateLog(this);
             _createErrorResponse = createErrorResponse ?? throw new ArgumentNullException(nameof(createErrorResponse));
             _next = next;
+            _useOldLog = false;
         }
 
         public async Task Invoke(HttpContext context)
@@ -66,14 +69,28 @@ namespace Lykke.Common.ApiLibrary.Middleware
             var urlWithoutQuery = RequestUtils.GetUrlWithoutQuery(url) ?? "?";
             var body = await RequestUtils.GetRequestPartialBodyAsync(context);
 
-            _log.Error(
-                ex,
-                context: new
-                {
-                    url,
-                    body
-                },
-                process: urlWithoutQuery);
+            if (_useOldLog)
+            {
+                _log.WriteError(
+                    exception: ex,
+                    context: new
+                    {
+                        url,
+                        body
+                    },
+                    process: urlWithoutQuery);
+            }
+            else
+            {
+                _log.Error(
+                    ex,
+                    context: new
+                    {
+                        url,
+                        body
+                    },
+                    process: urlWithoutQuery);
+            }
         }
 
         private async Task CreateErrorResponse(HttpContext ctx, Exception ex)
